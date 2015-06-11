@@ -2,6 +2,36 @@
 
 > Connects Slack and IRC channels by sending messages back and forth. Read more [here](https://ekmartin.com/2015/slack-irc/).
 
+
+This is modified version of slack-irc bot, that includes NEM tipbot.
+
+tipbot's code is far from being pretty, it should be treated **AS A TOY**,
+but it's purpose is to show how one can VERY easily interact with NIS API.
+
+There's also a pretty serious issue, it's using (unencrypted)
+json file to store information about private/public keys,
+additionally synchronization sux.
+
+Proper version should use some kind of db, node-sqlite should be enough for this purpose.
+
+Few words about API.
+
+* Nemdb - this is dumb fs wrapper
+* Nem - that is part that interacts with NIS (more below)
+* Bot - some new methods/modifications to let it run on slack
+
+Nem() api:
+* `.chainHeight(cb)` -> returns current height of the blockchain
+* `.accountGenerate(cb) -> creates new account (public key, private key, address)
+* `.balanceGen(address, back, cb)` -> method that abuses bigalice3 node, to get account data //back// blocks behind, you can change it to your own node, but it needs to support `HISTORICAL\_ACCOUNT\_DATA` in `nis.optionalFeatures` inside `config.properties`
+* `.nodeExtendedInfo(cb)` -> get node extended info (required to get current NEM network time)
+* `.makeTransfer(depositData, destinationAddress, amountInNem, transactionFee, cb)` -> make a transfer transaction (http://bob.nem.ninja/docs/#initiating-transactions)
+* `.get` / `.post` -> convenient wrappers for GET/POST NIS request (see the docs for all APIs (http://bob.nem.ninja/docs/)
+
+Both Nem, and Nemdb should be extracted into separate modules, feel free to do that and make a pull request.
+
+(you can test it on testnet, just remebmer to set proper `version` inside `.makeTransfer`)
+
 ## Demo
 ![Slack IRC](http://i.imgur.com/58H6HgO.gif)
 
